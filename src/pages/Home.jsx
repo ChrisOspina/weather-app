@@ -1,7 +1,7 @@
 import React from "react";
-import { ICON_MAP } from "./iconMap";
+import { ICON_MAP } from "../api/iconMap";
 import "./style.css";
-import { getWeather } from "./api/weather";
+import { getWeather } from "../api/weather";
 
 const Home = () => {
   const positionSuccess = ({ coords }) => {
