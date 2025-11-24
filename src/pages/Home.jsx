@@ -1,6 +1,5 @@
 import React from "react";
 import { ICON_MAP } from "../api/iconMap";
-import "./style.css";
 import { getWeather } from "../api/weather";
 
 const Home = () => {
