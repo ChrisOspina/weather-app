@@ -203,7 +203,7 @@ const Home = () => {
     >
       <div className="max-w-7xl mx-auto">
         <h1 className="text-4xl font-bold text-gray-600 mb-8 text-center">
-          Weather Dashboard
+          Anipso Weather Dashboard
         </h1>
         {isLoading ? (
           <div className="flex items-center justify-center h-64">
