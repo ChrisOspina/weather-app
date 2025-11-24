@@ -1,108 +1,231 @@
-import React from "react";
-import { ICON_MAP } from "../api/iconMap";
+import { useEffect, useState } from "react";
 import { getWeather } from "../api/weather";
+import { DAY_FORMATTER, HOUR_FORMATTER } from "../helpers/formatters";
+import { getIconUrl } from "../helpers/get-icons";
 
 const Home = () => {
-  const positionSuccess = ({ coords }) => {
-    getWeather(
-      coords.latitude,
-      coords.longitude,
-      Intl.DateTimeFormat().resolvedOptions().timeZone
-    )
-      .then(renderWeather)
-      .catch((e) => {
-        console.error(e);
-        alert("Error getting weather.");
-      });
-  };
+  const [weatherData, setWeatherData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const positionError = () => {
-    alert(
-      "There was an error getting your location. Please allow us to use your location and refresh the page"
+  useEffect(() => {
+    const positionSuccess = ({ coords }) => {
+      getWeather(
+        coords.latitude,
+        coords.longitude,
+        Intl.DateTimeFormat().resolvedOptions().timeZone
+      )
+        .then((data) => {
+          setWeatherData(data);
+          setIsLoading(false);
+        })
+        .catch((e) => {
+          console.error(e);
+          alert("Error getting weather.");
+          setIsLoading(false);
+        });
+    };
+
+    const positionError = () => {
+      alert(
+        "There was an error getting your location. Please allow us to use your location and refresh the page"
+      );
+      setIsLoading(false);
+    };
+    navigator.geolocation.getCurrentPosition(positionSuccess, positionError);
+  }, []);
+
+  //render current weather section
+  const renderCurrentWeather = (current) => {
+    if (!current) return null;
+
+    return (
+      <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-5xl font-bold text-gray-800 mb-2">
+              {current.currentTemp}°
+            </h2>
+            <div className="flex gap-4 text-gray-600">
+              <span>H: {current.highTemp}°</span>
+              <span>L: {current.lowTemp}°</span>
+            </div>
+          </div>
+          <img
+            src={getIconUrl(current.iconCode)}
+            alt="Weather icon"
+            className="w-24 h-24"
+          />
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-6 border-t border-gray-200">
+          <div>
+            <p className="text-sm text-gray-500 mb-1">Feels Like High</p>
+            <p className="text-lg font-semibold text-gray-800">
+              {current.highFeelsLike}°
+            </p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500 mb-1">Feels Like Low</p>
+            <p className="text-lg font-semibold text-gray-800">
+              {current.lowFeelsLike}°
+            </p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500 mb-1">Wind Speed</p>
+            <p className="text-lg font-semibold text-gray-800">
+              {current.windSpeed} mph
+            </p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500 mb-1">Precipitation</p>
+            <p className="text-lg font-semibold text-gray-800">
+              {current.precip}%
+            </p>
+          </div>
+        </div>
+      </div>
     );
   };
 
-  navigator.geolocation.getCurrentPosition(positionSuccess, positionError);
-
-  const renderWeather = ({ current, daily, hourly }) => {
-    renderCurrentWeather(current);
-    renderDailyWeather(daily);
-    renderHourlyWeather(hourly);
-    document.body.classList.remove("blurred");
-  };
-
-  getWeather(10, 10, Intl.DateTimeFormat().resolvedOptions().timeZone)
-    .then(renderWeather)
-    .catch((e) => {
-      console.error(e);
-      alert("Error getting weather");
-    });
-
-  const setValue = (selector, value, { parent = document } = {}) => {
-    parent.querySelector(`[data-${selector}]`).textContent = value;
-  };
-
-  const getIconUrl = (iconCode) => {
-    return `icons/${ICON_MAP.get(iconCode)}.svg`;
-  };
-
-  const currentIcon = document.querySelector("[data-current-icon]");
-  const renderCurrentWeather = (current) => {
-    currentIcon.src = getIconUrl(current.iconCode);
-    setValue("current-temp", current.currentTemp);
-    setValue("current-high", current.highTemp);
-    setValue("current-low", current.lowTemp);
-    setValue("current-fl-high", current.highFeelsLike);
-    setValue("current-fl-low", current.lowFeelsLike);
-    setValue("current-wind", current.windSpeed);
-    setValue("current-precip", current.precip);
-  };
-
-  const DAY_FORMATTER = new Intl.DateTimeFormat(undefined, {
-    weekday: "short",
-  });
-  const dailySection = document.querySelector("[data-day-section]");
-  const dayCardTemplate = document.getElementById("day-card-template");
-
+  // Render daily weather section
   const renderDailyWeather = (daily) => {
-    dailySection.innerHTML = "";
-    daily.forEach((day) => {
-      const element = dayCardTemplate.content.cloneNode(true);
-      setValue("temp", day.maxTemp, { parent: element });
-      setValue("date", DAY_FORMATTER.format(day.timestamp), {
-        parent: element,
-      });
-      element.querySelector("[data-icon]").src = getIconUrl(day.iconCode);
-      dailySection.append(element);
-    });
+    if (!daily) return null;
+
+    return (
+      <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
+        <h3 className="text-2xl font-bold text-gray-600 mb-4 text-center">
+          7-Day Forecast
+        </h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+          {daily.map((day, index) => (
+            <div
+              key={index}
+              className="flex flex-col items-center p-4 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <span className="text-sm font-medium text-gray-600 mb-2">
+                {DAY_FORMATTER.format(day.timestamp)}
+              </span>
+              <img
+                src={getIconUrl(day.iconCode)}
+                alt="Weather icon"
+                className="w-12 h-12 mb-2"
+              />
+              <div data-temp>{day.maxTemp}°</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
   };
 
-  const HOUR_FORMATTER = new Intl.DateTimeFormat(undefined, {
-    hour: "numeric",
-  });
-  const hourlySection = document.querySelector("[data-hour-section]");
-  const hourRowTemplate = document.getElementById("hour-row-template");
-
+  // Render hourly weather section
   const renderHourlyWeather = (hourly) => {
-    hourlySection.innerHTML = "";
-    hourly.forEach((hour) => {
-      const element = hourRowTemplate.content.cloneNode(true);
-      setValue("temp", hour.temp, { parent: element });
-      setValue("fl-temp", hour.feelsLike, { parent: element });
-      setValue("wind", hour.windSpeed, { parent: element });
-      setValue("precip", hour.precip, { parent: element });
-      setValue("day", DAY_FORMATTER.format(hour.timestamp), {
-        parent: element,
-      });
-      setValue("time", HOUR_FORMATTER.format(hour.timestamp), {
-        parent: element,
-      });
-      element.querySelector("[data-icon]").src = getIconUrl(hour.iconCode);
-      hourlySection.append(element);
-    });
+    if (!hourly) return null;
+
+    return (
+      <div className="bg-white rounded-2xl shadow-lg p-6">
+        <h3 className="text-2xl font-bold text-gray-600 mb-4 text-center">
+          Hourly Forecast
+        </h3>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-gray-200">
+                <th className="text-left py-3 px-2 text-sm font-semibold text-gray-600">
+                  Day
+                </th>
+                <th className="text-left py-3 px-2 text-sm font-semibold text-gray-600">
+                  Time
+                </th>
+                <th className="text-center py-3 px-2 text-sm font-semibold text-gray-600">
+                  Weather
+                </th>
+                <th className="text-right py-3 px-2 text-sm font-semibold text-gray-600">
+                  Temp
+                </th>
+                <th className="text-right py-3 px-2 text-sm font-semibold text-gray-600">
+                  Feels Like
+                </th>
+                <th className="text-right py-3 px-2 text-sm font-semibold text-gray-600">
+                  Wind
+                </th>
+                <th className="text-right py-3 px-2 text-sm font-semibold text-gray-600">
+                  Precip
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {hourly.map((hour, index) => (
+                <tr
+                  key={index}
+                  className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                >
+                  <td className="py-3 px-2 text-sm text-gray-600">
+                    {DAY_FORMATTER.format(hour.timestamp)}
+                  </td>
+                  <td className="py-3 px-2 text-sm text-gray-800 font-medium">
+                    {HOUR_FORMATTER.format(hour.timestamp)}
+                  </td>
+                  <td className="py-3 px-2 text-center">
+                    <img
+                      src={getIconUrl(hour.iconCode)}
+                      alt="Weather icon"
+                      className="w-8 h-8 mx-auto"
+                    />
+                  </td>
+
+                  <td className="py-3 px-2 text-right text-sm text-gray-600">
+                    <span>{hour.temp}°</span>
+                  </td>
+                  <td className="py-3 px-2 text-right text-sm text-gray-600">
+                    <span>{hour.feelsLike}°</span>
+                  </td>
+                  <td className="py-3 px-2 text-right text-sm text-gray-600">
+                    <span>{hour.windSpeed}</span>
+                  </td>
+                  <td className="py-3 px-2 text-right text-sm text-gray-600">
+                    <span>{hour.precip}</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
   };
 
-  return <div>Home</div>;
+  //Main render
+  return (
+    <div
+      className={`min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4 transition-all duration-300 ${
+        isLoading ? "blur-sm" : ""
+      }`}
+    >
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-4xl font-bold text-gray-600 mb-8 text-center">
+          Weather Dashboard
+        </h1>
+        {isLoading ? (
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto mb-4"></div>
+              <p className="text-gray-600 text-lg">Loading weather data...</p>
+            </div>
+          </div>
+        ) : weatherData ? (
+          <>
+            {renderCurrentWeather(weatherData.current)}
+            {renderDailyWeather(weatherData.daily)}
+            {renderHourlyWeather(weatherData.hourly)}
+          </>
+        ) : (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+            <p className="text-red-800 text-lg">Unable to load weather data</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 };
 
 export default Home;
