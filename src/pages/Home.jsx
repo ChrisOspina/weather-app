@@ -2,27 +2,36 @@ import { useEffect, useState } from "react";
 import { getWeather } from "../api/weather";
 import { DAY_FORMATTER, HOUR_FORMATTER } from "../helpers/formatters";
 import { getIconUrl } from "../helpers/get-icons";
+import { getLocation } from "../api/location";
+import { MapPin } from "lucide-react";
 
 const Home = () => {
   const [weatherData, setWeatherData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [location, setLocation] = useState(null);
 
   useEffect(() => {
-    const positionSuccess = ({ coords }) => {
-      getWeather(
-        coords.latitude,
-        coords.longitude,
-        Intl.DateTimeFormat().resolvedOptions().timeZone
-      )
-        .then((data) => {
-          setWeatherData(data);
-          setIsLoading(false);
-        })
-        .catch((e) => {
-          console.error(e);
-          alert("Error getting weather.");
-          setIsLoading(false);
-        });
+    const positionSuccess = async ({ coords }) => {
+      try {
+        const locationName = await getLocation(
+          coords.latitude,
+          coords.longitude
+        );
+        setLocation(locationName);
+
+        const data = await getWeather(
+          coords.latitude,
+          coords.longitude,
+          Intl.DateTimeFormat().resolvedOptions().timeZone
+        );
+
+        setWeatherData(data);
+        setIsLoading(false);
+      } catch (e) {
+        console.error(e);
+        alert("Error getting weather.");
+        setIsLoading(false);
+      }
     };
 
     const positionError = () => {
@@ -40,6 +49,17 @@ const Home = () => {
 
     return (
       <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
+        {location && (
+          <div className="mb-4">
+            <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+              <div>
+                <MapPin className="text-blue-500 h-4 w-4" />
+              </div>
+              {location}
+            </h2>
+            <div></div>{" "}
+          </div>
+        )}
         <div className="flex items-center justify-between mb-6">
           <div>
             <h2 className="text-5xl font-bold text-gray-800 mb-2">
