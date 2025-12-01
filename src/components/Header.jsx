@@ -1,4 +1,5 @@
 import React from "react";
+import { ThemeToggle } from "./ThemeToggle";
 
 const Header = () => {
   return (
@@ -14,7 +15,9 @@ const Header = () => {
           />
         </a>
       </div>
-      <div className="flex gap-4"></div>
+      <div className="flex gap-4">
+        <ThemeToggle />
+      </div>
     </header>
   );
 };
