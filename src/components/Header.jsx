@@ -1,5 +1,6 @@
 import React from "react";
 import { ThemeToggle } from "./ThemeToggle";
+import CitySearch from "./CitySearch";
 
 const Header = () => {
   return (
@@ -14,9 +15,10 @@ const Header = () => {
             alt="anipso logo"
           />
         </a>
-      </div>
-      <div className="flex gap-4">
-        <ThemeToggle />
+        <div className="flex gap-4 items-center">
+          <CitySearch />
+          <ThemeToggle />
+        </div>
       </div>
     </header>
   );
