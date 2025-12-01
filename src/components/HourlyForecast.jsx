@@ -14,6 +14,8 @@ const HourlyForecast = ({ hourly }) => {
   if (!hourly) {
     return null;
   }
+  const MAX_ROWS = 24;
+  hourly = hourly?.slice(0, MAX_ROWS);
 
   return (
     <div>
