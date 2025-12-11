@@ -1,6 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
+import { WeatherAPI } from "../api/weather";
 
-//TODO create WEATHER_KEYS and weatherAPI
+export const WEATHER_KEYS = {
+  weather: (coords) => ["weather", coords],
+  forecast: (coords) => ["forecast", coords],
+  location: (coords) => ["location", coords],
+  search: (query) => ["location-search", query],
+};
 
 export function useWeatherQuery() {}
 
@@ -11,7 +17,7 @@ export function usereverseGeocode() {}
 export function useLocationSearch(query) {
   return useQuery({
     queryKey: WEATHER_KEYS.search(query),
-    queryFn: () => weatherAPI.searchLocations(query),
+    queryFn: () => WeatherAPI.searchLocations(query),
     enabled: query.length >= 3,
   });
 }

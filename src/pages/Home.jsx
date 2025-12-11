@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
-import { getWeather } from "../api/weather";
 import { getLocation } from "../api/location";
 import DailyForcecast from "../components/DailyForecast";
 import HourlyForecast from "../components/HourlyForecast";
 import CurrentWeather from "../components/CurrentWeather";
+import { WeatherAPI } from "../api/weather";
 
 const Home = () => {
   const [weatherData, setWeatherData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [location, setLocation] = useState(null);
+
+  const weatherApi = new WeatherAPI();
 
   useEffect(() => {
     const positionSuccess = async ({ coords }) => {
@@ -19,7 +21,7 @@ const Home = () => {
         );
         setLocation(locationName);
 
-        const data = await getWeather(
+        const data = await weatherApi.getWeather(
           coords.latitude,
           coords.longitude,
           Intl.DateTimeFormat().resolvedOptions().timeZone

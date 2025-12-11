@@ -3,11 +3,28 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import { Command, CommandDialog, CommandInput } from "../components/ui/command";
+import { useLocationSearch } from "../hooks/useWeather";
+import { useFavorites } from "../hooks/useFavorites";
+import { useSearchHistory } from "../hooks/useSearchHistory";
 
 const CitySearch = () => {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const navigate = useNavigate();
+
+  const { locations, isloading } = useLocationSearch(query);
+  const { favorites } = useFavorites();
+  const { history, clearHistory, addToHistory } = useSearchHistory();
+
+  const handleSelect = (cityData) => {
+    addToHistory(cityData);
+    setOpen(false);
+    navigate(
+      `/?city=${encodeURIComponent(cityData.name)}&country=${encodeURIComponent(
+        cityData.country
+      )}&lat=${cityData.lat}&lon=${cityData.lon}`
+    );
+  };
 
   return (
     <div>
