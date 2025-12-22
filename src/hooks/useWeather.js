@@ -8,12 +8,29 @@ export const WEATHER_KEYS = {
   search: (query) => ["location-search", query],
 };
 
-export function useWeatherQuery() {}
+export function useWeatherQuery(coords) {
+  return useQuery({
+    queryKey: WEATHER_KEYS.weather(coords),
+    queryFn: () => WeatherAPI.getWeather(coords),
+    enabled: coords !== null,
+  });
+}
 
-export function useForecastQuery() {}
+export function useForecastQuery(coords) {
+  return useQuery({
+    queryKey: WEATHER_KEYS.forecast(coords),
+    queryFn: () => WeatherAPI.getForecast(coords),
+    enabled: coords !== null,
+  });
+}
 
-export function usereverseGeocode() {}
-
+export function useReverseGeocode(coords) {
+  return useQuery({
+    queryKey: WEATHER_KEYS.location(coords),
+    queryFn: () => WeatherAPI.getReverseGeocode(coords),
+    enabled: coords !== null,
+  });
+}
 export function useLocationSearch(query) {
   return useQuery({
     queryKey: WEATHER_KEYS.search(query),
