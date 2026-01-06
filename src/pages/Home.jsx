@@ -10,8 +10,6 @@ const Home = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [location, setLocation] = useState(null);
 
-  //const weatherApi = new WeatherAPI();
-
   useEffect(() => {
     const weatherApi = new WeatherAPI();
 
