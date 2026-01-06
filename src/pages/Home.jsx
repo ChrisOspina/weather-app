@@ -43,7 +43,7 @@ const Home = () => {
       setIsLoading(false);
     };
     navigator.geolocation.getCurrentPosition(positionSuccess, positionError);
-  }, []);
+  }, [weatherApi]);
 
   return (
     <div
