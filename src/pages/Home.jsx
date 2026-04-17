@@ -47,19 +47,19 @@ const Home = () => {
 
   return (
     <div
-      className={`min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4 transition-all duration-300 ${
+      className={`min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-slate-800 py-8 px-4 transition-all duration-300 ${
         isLoading ? "blur-sm" : ""
       }`}
     >
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-bold text-gray-600 mb-8 text-center">
+        <h1 className="text-4xl font-bold text-foreground mb-8 text-center">
           Anipso Weather Dashboard
         </h1>
         {isLoading ? (
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
               <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto mb-4"></div>
-              <p className="text-gray-600 text-lg">Loading weather data...</p>
+              <p className="text-gray-600 dark:text-gray-300 text-lg">Loading weather data...</p>
             </div>
           </div>
         ) : weatherData ? (
