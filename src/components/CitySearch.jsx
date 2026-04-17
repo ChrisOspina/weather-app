@@ -27,13 +27,13 @@ const CitySearch = () => {
   const { favorites } = useFavorites();
   const { history, clearHistory, addToHistory } = useSearchHistory();
 
-  const handleSelect = (cityData) => {
-    addToHistory(cityData);
+  const handleSelect = (value) => {
+    const [lat, lon, name, country] = value.split("|");
+    const cityData = { lat: parseFloat(lat), lon: parseFloat(lon), name, country };
+    addToHistory.mutate(cityData);
     setOpen(false);
     navigate(
-      `/?city=${encodeURIComponent(cityData.name)}&country=${encodeURIComponent(
-        cityData.country
-      )}&lat=${cityData.lat}&lon=${cityData.lon}`
+      `/?city=${encodeURIComponent(name)}&country=${encodeURIComponent(country)}&lat=${lat}&lon=${lon}`
     );
   };
 

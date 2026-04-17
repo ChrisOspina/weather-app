@@ -133,9 +133,9 @@
 .dark div,
 .dark td,
 .dark th {
-  color: var(--foreground);
+  color: #ffff;
 }
 
-.dark .text-muted-foreground {
+/* .dark .text-muted-foreground {
   color: var(--muted-foreground);
-}
+} */

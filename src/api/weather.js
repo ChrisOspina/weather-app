@@ -88,8 +88,25 @@ export class WeatherAPI {
         (entry) => entry.timestamp >= Number(current_weather.time) * 1000
       );
   }
+  static async searchLocations(query) {
+    try {
+      const { data } = await axios.get(
+        "https://geocoding-api.open-meteo.com/v1/search",
+        {
+          params: { name: query, count: 10, language: "en", format: "json" },
+        }
+      );
+      return (
+        data.results?.map((result) => ({
+          name: result.name,
+          lat: result.latitude,
+          lon: result.longitude,
+          country: result.country,
+          state: result.admin1,
+        })) ?? []
+      );
+    } catch (error) {
+      throw new Error(`Failed to search locations: ${error.message}`);
+    }
+  }
 }
-
-// Usage example:
-// const weatherAPI = new WeatherAPI();
-// const weather = await weatherAPI.getWeather(40.7128, -74.0060, "America/New_York");

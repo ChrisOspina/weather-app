@@ -32,9 +32,10 @@ export function useReverseGeocode(coords) {
   });
 }
 export function useLocationSearch(query) {
-  return useQuery({
+  const { data: locations, isLoading } = useQuery({
     queryKey: WEATHER_KEYS.search(query),
     queryFn: () => WeatherAPI.searchLocations(query),
     enabled: query.length >= 3,
   });
+  return { locations, isLoading };
 }
